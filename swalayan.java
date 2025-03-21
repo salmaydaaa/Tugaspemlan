@@ -5,9 +5,9 @@ class Pelanggan {
     String nama;
     double saldo;
     String pin;
-    String statusAkun; 
+    String statusAkun;  
 
-  
+
     public Pelanggan(String nomorPelanggan, String nama, double saldo, String pin) { 
         this.nomorPelanggan = nomorPelanggan;
         this.nama = nama;
@@ -16,7 +16,6 @@ class Pelanggan {
         this.statusAkun = "unblocked";  
     }
 
-    
     public String getJenisPelanggan() {  
         String prefix = nomorPelanggan.substring(0, 2);  
     
@@ -31,34 +30,42 @@ class Pelanggan {
         } 
     }
 
-
     public double hitungCashback(double totalPembelian) {
         double cashback = 0;
+        
+        System.out.println("Total Pembelian: " + totalPembelian);
+        System.out.println("Jenis Pelanggan: " + getJenisPelanggan());
+        
         if (totalPembelian > 1000000) {
             if (getJenisPelanggan().equals("Silver")) {
-                cashback = 0.05 * totalPembelian; // cashback 5% u/ Silver
+                cashback = 0.05 * totalPembelian; // cashback 5% untuk Silver
             } else if (getJenisPelanggan().equals("Gold")) {
-                cashback = 0.07 * totalPembelian; // cashback 7% u/ Gold
+                cashback = 0.07 * totalPembelian; // cashback 7% untuk Gold
             } else if (getJenisPelanggan().equals("Platinum")) {
-                cashback = 0.10 * totalPembelian; // cashback 10% u/ Platinum
+                cashback = 0.10 * totalPembelian; // cashback 10% untuk Platinum
             }
         } else { 
             if (getJenisPelanggan().equals("Gold")) {
-                cashback = 0.02 * totalPembelian; // cashback 2% u/ Gold dibawah 1jt
+                cashback = 0.02 * totalPembelian; // cashback 2% untuk Gold dibawah 1jt
             } else if (getJenisPelanggan().equals("Platinum")) {
-                cashback = 0.05 * totalPembelian; // cashback 5% u/ Platinum dibawah 1jt
-            } 
-        }  
+                cashback = 0.05 * totalPembelian; // cashback 5% untuk Platinum dibawah 1jt
+            }
+        }
+
+       
+        System.out.println("Cashback: " + String.format("%.2f", cashback));
+        
         return cashback;
     }
 
-   
+    
     public boolean transaksiPembelian(double totalPembelian, String inputPin) {
         if (statusAkun.equals("blocked")) {  
             System.out.println("Akun Anda diblokir.");
             return false;
         }
 
+       
         if (!pin.equals(inputPin)) {
             return false;
         }
@@ -71,13 +78,14 @@ class Pelanggan {
             return false;
         }
 
-        saldo -= totalSetelahPembelian; 
-        saldo += cashback;  
+        saldo -= totalSetelahPembelian;  
+        saldo += cashback; 
 
-        System.out.println("Pembelian berhasil! Cashback sebesar Rp" + cashback + " telah dikreditkan.");
-        System.out.println("Saldo akhir Anda adalah: Rp" + saldo);
+        
+        System.out.println("Pembelian berhasil! Cashback sebesar Rp" + String.format("%.2f", cashback) + " telah dikreditkan.");
+        System.out.println("Saldo akhir Anda adalah: Rp" + String.format("%.2f", saldo));
         return true;    
-    } 
+    }
 
     
     public boolean topUp(double jumlahTopUp, String inputPin) { 
@@ -86,27 +94,25 @@ class Pelanggan {
             return false;
         }
 
-     
+        
         if (!pin.equals(inputPin)) {
             return false;
         }
 
         saldo += jumlahTopUp;
-        System.out.println("Top-up berhasil! Saldo Anda sekarang: Rp" + saldo);
+        System.out.println("Top-up berhasil! Saldo Anda sekarang: Rp" + String.format("%.2f", saldo));
         return true;
     }
 
-    
     public void blokirAkun() {
         statusAkun = "blocked";  
     }
-} 
+}
 
 public class tinySwalayan {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
-       
         System.out.print("Masukkan nomor pelanggan: ");
         String nomorPelanggan = scanner.nextLine();
 
@@ -115,11 +121,11 @@ public class tinySwalayan {
 
         System.out.print("Masukkan saldo awal pelanggan: Rp");
         double saldo = scanner.nextDouble();
-        scanner.nextLine(); 
+        scanner.nextLine();  // Clear buffer
 
         System.out.print("Masukkan PIN pelanggan: ");
         String pin = scanner.nextLine();
-        
+
         Pelanggan pelanggan = new Pelanggan(nomorPelanggan, nama, saldo, pin);
 
         int kesalahanPin = 0;
@@ -137,30 +143,6 @@ public class tinySwalayan {
                 System.out.print("Masukkan PIN: ");
                 String pinInput = scanner.nextLine();
 
-          
-                if (!pinInput.equals(pelanggan.pin)) {
-                    System.out.println("PIN salah!");
-                    kesalahanPin++;
-                    if (kesalahanPin == 3) {
-                        pelanggan.blokirAkun();
-                        System.out.println("Akun diblokir karena 3 kali kesalahan PIN.");
-                    }
-                    continue;
-                }
-
-            
-                if (kesalahanPin< 3) {
-                    System.out.print("Masukkan total pembelian: Rp");   
-                    double totalPembelian = scanner.nextDouble(); 
-                    if (pelanggan.transaksiPembelian(totalPembelian, pinInput)) {
-                        kesalahanPin = 0; 
-                    }
-                }
-            } else if (menu == 2) { // Top-up
-                System.out.print("Masukkan PIN: ");
-                String pinInput = scanner.nextLine();
-
-              
                 if (!pinInput.equals(pelanggan.pin)) {
                     System.out.println("PIN salah!");
                     kesalahanPin++;
@@ -172,10 +154,31 @@ public class tinySwalayan {
                 }
 
                 if (kesalahanPin < 3) {
+                    System.out.print("Masukkan total pembelian: Rp");   
+                    double totalPembelian = scanner.nextDouble(); 
+                    if (pelanggan.transaksiPembelian(totalPembelian, pinInput)) {
+                        kesalahanPin = 0; // Reset jika transaksi berhasil 
+                    }
+                }
+            } else if (menu == 2) { // Top-up
+                System.out.print("Masukkan PIN: ");
+                String pinInput = scanner.nextLine();
+
+                if (!pinInput.equals(pelanggan.pin)) {
+                    System.out.println("PIN salah!");
+                    kesalahanPin++;
+                    if (kesalahanPin == 3) {
+                        pelanggan.blokirAkun();
+                        System.out.println("Akun diblokir karena 3 kali kesalahan PIN.");
+                    }
+                    continue;
+                }
+                
+                if (kesalahanPin < 3) {
                     System.out.print("Masukkan jumlah top-up: Rp");
                     double jumlahTopUp = scanner.nextDouble();
                     if (pelanggan.topUp(jumlahTopUp, pinInput)) {
-                        kesalahanPin = 0; 
+                        kesalahanPin = 0; // Reset jika transaksi berhasil
                     }
                 }
             } else if (menu == 3) { // Keluar

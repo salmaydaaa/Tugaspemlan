@@ -17,13 +17,13 @@ class Pelanggan {
     }
 
     public String getJenisPelanggan() {  
-        String prefix = nomorPelanggan.substring(0, 2);  
+        String kodeAwal = nomorPelanggan.substring(0, 2);  
     
-        if (prefix.equals("38")) {
+        if (kodeAwal.equals("38")) {
             return "Silver";
-        } else if (prefix.equals("56")) {
+        } else if (kodeAwal.equals("56")) {
             return "Gold";
-        } else if (prefix.equals("74")) {
+        } else if (kodeAwal.equals("74")) {
             return "Platinum";
         } else {
             return "Unknown";
